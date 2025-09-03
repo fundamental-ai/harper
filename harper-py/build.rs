@@ -8,9 +8,9 @@ fn main() {
 }
 
 fn generate_stubs() -> Result<(), Box<dyn std::error::Error>> {
-    use pyo3_stub_gen::generate_pyi;
+    use pyo3_stub_gen::generate;
     
-    let output = generate_pyi("harper_py")?;
+    let output = generate("harper_py")?;
     std::fs::write("harper_py.pyi", output)?;
     Ok(())
 }
