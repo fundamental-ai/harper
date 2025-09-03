@@ -70,7 +70,7 @@ impl HarperLinter {
     /// Count grammar errors in text
     fn count_errors(&self, text: &str) -> usize {
         let doc = Document::new(text, &PlainEnglish, &*self.merged_dict);
-        let linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
+        let mut linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
         let lints = linter.lint(&doc);
         lints.len()
     }
@@ -78,7 +78,7 @@ impl HarperLinter {
     /// Get detailed lint results
     fn lint(&self, text: &str) -> Vec<LintError> {
         let doc = Document::new(text, &PlainEnglish, &*self.merged_dict);
-        let linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
+        let mut linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
         let mut lints = linter.lint(&doc);
         
         remove_overlaps(&mut lints);
