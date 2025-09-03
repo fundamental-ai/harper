@@ -11,9 +11,10 @@
 
 use pyo3::prelude::*;
 use std::sync::Arc;
-use harper_core::spell::{FstDictionary, MergedDictionary, MutableDictionary};
+use std::path::PathBuf;
+use harper_core::spell::{Dictionary, FstDictionary, MergedDictionary, MutableDictionary};
 use harper_core::linting::{LintGroup, Linter};
-use harper_core::parsers::PlainEnglish;
+use harper_core::parsers::{PlainEnglish, MarkdownOptions};
 use harper_core::{Document, Dialect, remove_overlaps, WordMetadata};
 use std::fs;
 
@@ -68,7 +69,7 @@ impl HarperLinter {
     /// Count grammar errors in text
     fn count_errors(&self, text: &str) -> usize {
         let doc = Document::new(text, &PlainEnglish, &*self.merged_dict);
-        let mut linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
+        let linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
         let lints = linter.lint(&doc);
         lints.len()
     }
@@ -76,7 +77,7 @@ impl HarperLinter {
     /// Get detailed lint results
     fn lint(&self, text: &str) -> Vec<LintError> {
         let doc = Document::new(text, &PlainEnglish, &*self.merged_dict);
-        let mut linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
+        let linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
         let mut lints = linter.lint(&doc);
         
         remove_overlaps(&mut lints);
@@ -114,7 +115,7 @@ fn load_user_dict(path: &str) -> Result<MutableDictionary, Box<dyn std::error::E
 }
 
 #[pymodule]
-fn harper_py(_py: Python, m: &PyModule) -> PyResult<()> {
+fn harper_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<HarperLinter>()?;
     m.add_class::<LintError>()?;
     Ok(())
