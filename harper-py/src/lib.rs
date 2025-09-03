@@ -1,14 +1,3 @@
-// Cargo.toml needed:
-// [lib]
-// name = "harper_py"
-// crate-type = ["cdylib"]
-// 
-// [dependencies]
-// pyo3 = { version = "0.20", features = ["extension-module"] }
-// harper-core = { path = "../harper-core" }
-// harper-comments = { path = "../harper-comments" }
-// serde_json = "1.0"
-
 use pyo3::prelude::*;
 use pyo3::types::PyModule;
 use std::sync::Arc;
@@ -17,7 +6,6 @@ use harper_core::linting::{LintGroup, Linter};
 use harper_core::parsers::PlainEnglish;
 use harper_core::{Document, Dialect, remove_overlaps, WordMetadata};
 use std::fs;
-
 
 #[pyclass]
 pub struct HarperLinter {
@@ -36,9 +24,20 @@ pub struct LintError {
 }
 
 #[pymethods]
+impl LintError {
+    fn __repr__(&self) -> String {
+        format!("LintError(start={}, end={}, message='{}')", self.start, self.end, self.message)
+    }
+    
+    fn __str__(&self) -> String {
+        format!("{}-{}: {}", self.start, self.end, self.message)
+    }
+}
+
+#[pymethods]
 impl HarperLinter {
     #[new]
-    #[pyo3(signature = (user_dict_path=None, dialect="American"))]
+    #[pyo3(signature = (user_dict_path=None, dialect="American"), text_signature = "(user_dict_path: Optional[str] = None, dialect: str = 'American') -> None")]
     fn new(user_dict_path: Option<String>, dialect: &str) -> PyResult<Self> {
         // Setup curated dictionary
         let curated_dict = FstDictionary::curated();
@@ -68,6 +67,7 @@ impl HarperLinter {
     }
     
     /// Count grammar errors in text
+    #[pyo3(text_signature = "(text: str) -> int")]
     fn count_errors(&self, text: &str) -> usize {
         let doc = Document::new(text, &PlainEnglish, &*self.merged_dict);
         let mut linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
@@ -76,6 +76,7 @@ impl HarperLinter {
     }
     
     /// Get detailed lint results
+    #[pyo3(text_signature = "(text: str) -> List[LintError]")]
     fn lint(&self, text: &str) -> Vec<LintError> {
         let doc = Document::new(text, &PlainEnglish, &*self.merged_dict);
         let mut linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
@@ -94,15 +95,20 @@ impl HarperLinter {
     }
     
     /// Check if text has any errors (faster than count_errors for just boolean check)
+    #[pyo3(text_signature = "(text: str) -> bool")]
     fn has_errors(&self, text: &str) -> bool {
         let doc = Document::new(text, &PlainEnglish, &*self.merged_dict);
         let mut linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
         let lints = linter.lint(&doc);
         !lints.is_empty()
     }
+    
+    fn __repr__(&self) -> String {
+        format!("HarperLinter(dialect={:?})", self.dialect)
+    }
 }
 
-// Helper function to load user dictionary (copied from main.rs)
+// Helper function to load user dictionary
 fn load_user_dict(path: &str) -> Result<MutableDictionary, Box<dyn std::error::Error>> {
     let content = fs::read_to_string(path)?;
     let mut dict = MutableDictionary::new();
@@ -116,8 +122,14 @@ fn load_user_dict(path: &str) -> Result<MutableDictionary, Box<dyn std::error::E
 }
 
 #[pymodule]
+#[pyo3(name = "harper_py")]
 fn harper_py(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<HarperLinter>()?;
     m.add_class::<LintError>()?;
+    
+    // Add module-level documentation
+    m.add("__doc__", "Python bindings for Harper grammar checker")?;
+    m.add("__version__", "0.1.7")?;
+    
     Ok(())
 }
