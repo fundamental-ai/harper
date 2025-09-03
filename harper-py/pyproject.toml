@@ -1,0 +1,36 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "harper-py"
+version = "0.1.0"
+description = "Python bindings for Harper grammar checker"
+license = "Apache-2.0"
+authors = [
+    {name = "Sohail"},
+]
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Rust",
+    "Topic :: Text Processing :: Linguistic",
+]
+
+[tool.maturin]
+python-source = "python"
+module-name = "harper_py"
+
+[project.urls]
+Homepage = "https://github.com/fundamental-ai/harper"
+Repository = "https://github.com/fundamental-ai/harper"
