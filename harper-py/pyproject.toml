@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "harper-py"
-version = "0.1.8"
+version = "0.1.12"
 description = "Python bindings for Harper grammar checker"
 license = "Apache-2.0"
 authors = [
