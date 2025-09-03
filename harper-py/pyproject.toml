@@ -28,7 +28,6 @@ classifiers = [
 ]
 
 [tool.maturin]
-python-source = "python"
 module-name = "harper_py"
 
 [project.urls]
