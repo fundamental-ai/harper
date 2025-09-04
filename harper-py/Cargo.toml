@@ -1,6 +1,6 @@
 [package]
 name = "harper-py"
-version = "0.1.13"
+version = "0.1.15"
 edition = "2024"
 
 [lib]
@@ -9,8 +9,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { version = "0.25", features = ["extension-module"] }
-harper-core = { git = "https://github.com/fundamental-ai/harper.git", tag = "v0.1.13" }
-harper-comments = { git = "https://github.com/fundamental-ai/harper.git", tag = "v0.1.13" }
+harper-core = { git = "https://github.com/fundamental-ai/harper.git", tag = "v0.1.15" }
+harper-comments = { git = "https://github.com/fundamental-ai/harper.git", tag = "v0.1.15" }
 serde_json = "1.0"
 
 [workspace]
