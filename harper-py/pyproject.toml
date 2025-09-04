@@ -29,13 +29,9 @@ classifiers = [
 
 [tool.maturin]
 module-name = "harper_py"
-
-[tool.setuptools.package-data]
-"harper_py" = ["py.typed"]
-
-[tool.setuptools]
-packages = ["harper_py"]
-include-package-data = true
+include = [
+    { path = "harper_py/py.typed", format = "wheel" }
+]
 
 [project.urls]
 Homepage = "https://github.com/fundamental-ai/harper"
