@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "harper-py"
-version = "0.1.16"
+version = "0.1.17"
 description = "Python bindings for Harper grammar checker"
 license = "Apache-2.0"
 authors = [
@@ -30,8 +30,8 @@ classifiers = [
 [tool.maturin]
 module-name = "harper_py"
 include = [
-    {path = "py.typed", format = "wheel"},
-    {path = "harper_py.pyi", format = "wheel"}
+    {path = "harper-py/py.typed", format = "wheel"},
+    {path = "harper-py/harper_py.pyi", format = "wheel"}
 ]
 
 [project.urls]
