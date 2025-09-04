@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "harper-py"
-version = "0.1.12"
+version = "0.1.13"
 description = "Python bindings for Harper grammar checker"
 license = "Apache-2.0"
 authors = [
@@ -29,6 +29,13 @@ classifiers = [
 
 [tool.maturin]
 module-name = "harper_py"
+
+[tool.setuptools.package-data]
+"harper_py" = ["py.typed"]
+
+[tool.setuptools]
+packages = ["harper_py"]
+include-package-data = true
 
 [project.urls]
 Homepage = "https://github.com/fundamental-ai/harper"
