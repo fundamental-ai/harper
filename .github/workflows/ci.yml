@@ -54,9 +54,12 @@ jobs:
     - name: Build and install harper-py
       working-directory: harper-py
       run: |
+        python -m venv .venv
+        source .venv/bin/activate
         maturin develop --release
 
     - name: Run tests
       working-directory: harper-py
       run: |
+        source .venv/bin/activate
         python -m pytest tests/ -v
