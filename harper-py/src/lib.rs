@@ -11,6 +11,7 @@ use std::fs;
 pub struct HarperLinter {
     merged_dict: Arc<MergedDictionary>,
     dialect: Dialect,
+    linter: LintGroup,
 }
 
 #[pyclass]
@@ -60,27 +61,29 @@ impl HarperLinter {
             _ => Dialect::American,
         };
         
+        let merged_dict = Arc::new(merged_dict);
+        let linter = LintGroup::new_curated(merged_dict.clone(), dialect);
+        
         Ok(HarperLinter {
-            merged_dict: Arc::new(merged_dict),
+            merged_dict,
             dialect,
+            linter,
         })
     }
     
     /// Count grammar errors in text
     #[pyo3(text_signature = "(text: str) -> int")]
-    fn count_errors(&self, text: &str) -> usize {
+    fn count_errors(&mut self, text: &str) -> usize {
         let doc = Document::new(text, &PlainEnglish, &*self.merged_dict);
-        let mut linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
-        let lints = linter.lint(&doc);
+        let lints = self.linter.lint(&doc);
         lints.len()
     }
     
     /// Get detailed lint results
     #[pyo3(text_signature = "(text: str) -> List[LintError]")]
-    fn lint(&self, text: &str) -> Vec<LintError> {
+    fn lint(&mut self, text: &str) -> Vec<LintError> {
         let doc = Document::new(text, &PlainEnglish, &*self.merged_dict);
-        let mut linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
-        let mut lints = linter.lint(&doc);
+        let mut lints = self.linter.lint(&doc);
         
         remove_overlaps(&mut lints);
         
@@ -96,10 +99,9 @@ impl HarperLinter {
     
     /// Check if text has any errors (faster than count_errors for just boolean check)
     #[pyo3(text_signature = "(text: str) -> bool")]
-    fn has_errors(&self, text: &str) -> bool {
+    fn has_errors(&mut self, text: &str) -> bool {
         let doc = Document::new(text, &PlainEnglish, &*self.merged_dict);
-        let mut linter = LintGroup::new_curated(self.merged_dict.clone(), self.dialect);
-        let lints = linter.lint(&doc);
+        let lints = self.linter.lint(&doc);
         !lints.is_empty()
     }
     
