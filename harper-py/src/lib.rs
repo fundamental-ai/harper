@@ -7,7 +7,7 @@ use harper_core::parsers::PlainEnglish;
 use harper_core::{Document, Dialect, remove_overlaps, WordMetadata};
 use std::fs;
 
-#[pyclass]
+#[pyclass(unsendable)]
 pub struct HarperLinter {
     merged_dict: Arc<MergedDictionary>,
     dialect: Dialect,
@@ -61,7 +61,7 @@ impl HarperLinter {
             _ => Dialect::American,
         };
         
-        let merged_dict = Arc::new(merged_dict);
+        let merged_dict = Arc::new(merged_dict);  
         let linter = LintGroup::new_curated(merged_dict.clone(), dialect);
         
         Ok(HarperLinter {
