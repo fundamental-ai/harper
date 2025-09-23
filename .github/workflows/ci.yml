@@ -1,0 +1,65 @@
+name: Test Harper Python Bindings
+
+on:
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - 'harper-py/**'
+      - '.github/workflows/ci.yml'
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'harper-py/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+
+    - name: Cache Rust dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          harper-py/target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install maturin
+
+    - name: Build and install harper-py
+      working-directory: harper-py
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+        pip install pytest maturin
+        maturin develop --release
+
+    - name: Run tests
+      working-directory: harper-py
+      run: |
+        source .venv/bin/activate
+        python -m pytest tests/ -v
